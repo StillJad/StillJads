@@ -59,7 +59,6 @@ label {
 }
 
 input,
-select,
 button {
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -109,10 +108,6 @@ button:hover {
   padding: 0.65rem;
   background: #fbfcff;
   margin: 0.7rem 0;
-}
-
-#assistant-settings {
-  margin-top: 0.7rem;
 }
 
 .message {
