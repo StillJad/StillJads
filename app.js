@@ -8,13 +8,15 @@ const assistantSettingsForm = document.getElementById('assistant-settings');
 const assistantModeSelect = document.getElementById('assistant-mode');
 const apiKeyInput = document.getElementById('api-key');
 const assistantModelInput = document.getElementById('assistant-model');
+const useLocalProxyInput = document.getElementById('use-local-proxy');
 
 const savedTopics = JSON.parse(localStorage.getItem('studylift-topics') || '[]');
 const rawAssistantSettings = JSON.parse(localStorage.getItem('studylift-assistant-settings') || '{}');
 const assistantSettings = {
   mode: rawAssistantSettings.mode || 'offline',
   apiKey: rawAssistantSettings.apiKey || '',
-  model: rawAssistantSettings.model || ''
+  model: rawAssistantSettings.model || '',
+  useLocalProxy: rawAssistantSettings.useLocalProxy ?? true
 };
 
 function renderTopics() {
@@ -132,47 +134,54 @@ async function getGeminiReply(prompt) {
 }
 
 async function getArkLabsReply(prompt) {
+  const model = assistantSettings.model || 'gpt-4o';
   const apiKey = assistantSettings.apiKey;
-  if (!apiKey) {
-    return 'Please add your Ark Labs API key in Assistant Settings first, or switch back to Offline mode.';
+  if (!assistantSettings.useLocalProxy && !apiKey) {
+    return 'Please add your Ark Labs API key in Assistant Settings first, or enable local proxy mode.';
   }
 
-  const model = assistantSettings.model || 'gpt-4o';
-  const endpoint = 'https://api.ark-labs.cloud/api/v1/chat/completions';
-  const body = {
-    model,
-    temperature: 0.4,
-    messages: [
-      {
-        role: 'system',
-        content: 'You are a helpful O-level tutor. Keep explanations concise, exam-focused, and practical.'
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ]
-  };
-
   try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(body)
-    });
+    let response;
+    if (assistantSettings.useLocalProxy) {
+      response = await fetch('/api/ark-labs/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, model, apiKey })
+      });
+    } else {
+      response = await fetch('https://api.ark-labs.cloud/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model,
+          temperature: 0.4,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful O-level tutor. Keep explanations concise, exam-focused, and practical.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        })
+      });
+    }
 
     if (!response.ok) {
-      return 'Ark Labs API request failed. Check your key/model, then try again.';
+      const errorText = await response.text();
+      return `Ark Labs API request failed (${response.status}). ${errorText || 'Check your key/model and try again.'}`;
     }
 
     const data = await response.json();
     const text = data?.choices?.[0]?.message?.content;
     return text || 'No text response returned by Ark Labs. Try a different model or prompt.';
   } catch (_error) {
-    return 'Could not reach Ark Labs API from this browser right now. Offline mode still works.';
+    return 'Could not reach Ark Labs API from this browser. If this is a CORS issue, enable local proxy mode and run `node server.js`.';
   }
 }
 
@@ -212,8 +221,12 @@ assistantSettingsForm.addEventListener('submit', (event) => {
   assistantSettings.mode = assistantModeSelect.value;
   assistantSettings.apiKey = apiKeyInput.value.trim();
   assistantSettings.model = assistantModelInput.value.trim();
+  assistantSettings.useLocalProxy = useLocalProxyInput.checked;
   localStorage.setItem('studylift-assistant-settings', JSON.stringify(assistantSettings));
-  addMessage(`Settings saved. Assistant mode: ${assistantSettings.mode}, model: ${assistantSettings.model || 'default'}.`, 'assistant');
+  addMessage(
+    `Settings saved. Mode: ${assistantSettings.mode}, model: ${assistantSettings.model || 'default'}, local proxy: ${assistantSettings.useLocalProxy ? 'on' : 'off'}.`,
+    'assistant'
+  );
 });
 
 function hydrateAssistantSettings() {
@@ -228,6 +241,7 @@ function hydrateAssistantSettings() {
   } else {
     assistantModelInput.value = '';
   }
+  useLocalProxyInput.checked = Boolean(assistantSettings.useLocalProxy);
 }
 
 assistantModeSelect.addEventListener('change', () => {

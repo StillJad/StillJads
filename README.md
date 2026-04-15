@@ -10,7 +10,23 @@ A free browser-based study app for O Levels (and similar exam systems), with:
 
 ## Run locally
 
-Open `index.html` directly in your browser.
+### Quick start (recommended, avoids Ark Labs CORS issues)
+
+```bash
+node server.js
+```
+
+Then open `http://localhost:4173`.
+
+If you want the local proxy to keep Ark Labs key out of browser storage, run:
+
+```bash
+ARK_LABS_API_KEY=your_key_here node server.js
+```
+
+### Static mode
+
+You can still open `index.html` directly in your browser, but direct Ark Labs API calls may fail due to CORS depending on browser/network policy.
 
 ## Why this is free
 

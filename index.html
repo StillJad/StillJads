@@ -63,6 +63,10 @@
             Model
             <input id="assistant-model" placeholder="gemini-2.0-flash or gpt-4o" />
           </label>
+          <label class="inline-checkbox">
+            <input id="use-local-proxy" type="checkbox" />
+            Use local Ark Labs proxy (recommended to avoid browser CORS issues)
+          </label>
           <button type="submit">Save Assistant Settings</button>
         </form>
         <div id="chat-log" class="chat-log" aria-live="polite"></div>
@@ -80,7 +84,5 @@
     </footer>
 
     <script src="app.js"></script>
-  </body>
-</html>
   </body>
 </html>

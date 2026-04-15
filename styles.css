@@ -58,6 +58,12 @@ label {
   font-size: 0.95rem;
 }
 
+.inline-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 input,
 select,
 button {
