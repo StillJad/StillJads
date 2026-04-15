@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudyLift — Free O Level Study App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>StudyLift</h1>
+      <p>Free study app for O Levels and similar exams — with a no-cost AI helper.</p>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <h2>Your Study Plan</h2>
+        <form id="topic-form" class="stack">
+          <label>
+            Subject
+            <input id="subject" required placeholder="e.g. Physics" />
+          </label>
+          <label>
+            Topic
+            <input id="topic" required placeholder="e.g. Electricity" />
+          </label>
+          <button type="submit">Add Topic</button>
+        </form>
+        <ul id="study-list" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Quick Quiz Builder</h2>
+        <form id="quiz-form" class="stack">
+          <label>
+            Topic
+            <input id="quiz-topic" required placeholder="e.g. Cell Biology" />
+          </label>
+          <button type="submit">Generate Questions</button>
+        </form>
+        <div id="quiz-output" class="output"></div>
+      </section>
+
+      <section class="card">
+        <h2>AI Study Assistant (Free Mode)</h2>
+        <p class="subtle">
+          This assistant runs fully in your browser with simple tutoring logic, so no paid API is needed.
+        </p>
+        <div id="chat-log" class="chat-log" aria-live="polite"></div>
+        <form id="chat-form" class="chat-row">
+          <input id="chat-input" required placeholder="Ask for summaries, memory tips, revision plans..." />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        100% free starter build. You can host this on GitHub Pages at zero cost.
+      </p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
