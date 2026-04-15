@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
@@ -18,6 +19,42 @@ function sendJson(res, status, body) {
     'Access-Control-Allow-Origin': '*'
   });
   res.end(JSON.stringify(body));
+}
+
+function postJsonWithHttps(url, headers, payload) {
+  return new Promise((resolve, reject) => {
+    const requestBody = JSON.stringify(payload);
+    const request = https.request(
+      url,
+      {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Length': Buffer.byteLength(requestBody)
+        }
+      },
+      (response) => {
+        let raw = '';
+        response.on('data', (chunk) => {
+          raw += chunk;
+        });
+        response.on('end', () => {
+          resolve({
+            ok: response.statusCode >= 200 && response.statusCode < 300,
+            status: response.statusCode || 500,
+            text: raw
+          });
+        });
+      }
+    );
+
+    request.on('error', (error) => {
+      reject(error);
+    });
+
+    request.write(requestBody);
+    request.end();
+  });
 }
 
 async function handleArkLabsProxy(req, res) {
@@ -42,36 +79,47 @@ async function handleArkLabsProxy(req, res) {
   }
 
   try {
-    const upstream = await fetch('https://api.ark-labs.cloud/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.4,
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful O-level tutor. Keep explanations concise, exam-focused, and practical.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
-      })
-    });
+    const payload = {
+      model,
+      temperature: 0.4,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful O-level tutor. Keep explanations concise, exam-focused, and practical.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ]
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    };
 
-    const text = await upstream.text();
+    const upstream = typeof fetch === 'function'
+      ? await fetch('https://api.ark-labs.cloud/api/v1/chat/completions', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload)
+      }).then(async (response) => ({
+        ok: response.ok,
+        status: response.status,
+        text: await response.text()
+      }))
+      : await postJsonWithHttps('https://api.ark-labs.cloud/api/v1/chat/completions', headers, payload);
+
     res.writeHead(upstream.status, {
       'Content-Type': 'application/json; charset=utf-8',
       'Access-Control-Allow-Origin': '*'
     });
-    res.end(text);
-  } catch {
-    sendJson(res, 502, { error: 'Could not reach Ark Labs upstream API.' });
+    res.end(upstream.text);
+  } catch (error) {
+    sendJson(res, 502, {
+      error: 'Could not reach Ark Labs upstream API.',
+      detail: error?.message || 'Unknown proxy network error.'
+    });
   }
 }
 
