@@ -42,10 +42,29 @@
       </section>
 
       <section class="card">
-        <h2>AI Study Assistant (Free Mode)</h2>
+        <h2>AI Study Assistant</h2>
         <p class="subtle">
-          This assistant runs fully in your browser with simple tutoring logic, so no paid API is needed.
+          Default mode is fully offline (free). You can optionally connect Gemini free-tier or your Ark Labs account.
         </p>
+        <form id="assistant-settings" class="stack">
+          <label>
+            Mode
+            <select id="assistant-mode">
+              <option value="offline">Offline (No API key)</option>
+              <option value="gemini">Gemini API (Free tier)</option>
+              <option value="arklabs">Ark Labs (OpenAI-style API)</option>
+            </select>
+          </label>
+          <label>
+            API key (stored in your browser only)
+            <input id="api-key" type="password" placeholder="Paste Gemini or Ark Labs API key" />
+          </label>
+          <label>
+            Model
+            <input id="assistant-model" placeholder="gemini-2.0-flash or gpt-4o" />
+          </label>
+          <button type="submit">Save Assistant Settings</button>
+        </form>
         <div id="chat-log" class="chat-log" aria-live="polite"></div>
         <form id="chat-form" class="chat-row">
           <input id="chat-input" required placeholder="Ask for summaries, memory tips, revision plans..." />
@@ -61,5 +80,7 @@
     </footer>
 
     <script src="app.js"></script>
+  </body>
+</html>
   </body>
 </html>
