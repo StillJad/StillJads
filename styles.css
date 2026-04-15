@@ -1,0 +1,139 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #1f2a44;
+  --accent: #2f66ff;
+  --accent-2: #13b886;
+  --muted: #5d6b8a;
+  --border: #dbe2f0;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar,
+.footer {
+  text-align: center;
+  padding: 1rem;
+}
+
+.topbar h1 {
+  margin-bottom: 0.2rem;
+}
+
+.layout {
+  width: min(1100px, 94vw);
+  margin: 0 auto 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 14px rgba(27, 54, 109, 0.06);
+}
+
+.stack {
+  display: grid;
+  gap: 0.7rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+input,
+select,
+button {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  padding: 0.65rem 0.75rem;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  opacity: 0.92;
+}
+
+.list {
+  margin-top: 0.8rem;
+  padding-left: 1.1rem;
+}
+
+.list li {
+  margin: 0.4rem 0;
+}
+
+.output {
+  margin-top: 0.8rem;
+  border-left: 4px solid var(--accent-2);
+  background: #f0fdf7;
+  padding: 0.8rem;
+  min-height: 3rem;
+}
+
+.subtle {
+  color: var(--muted);
+  margin-top: -0.2rem;
+}
+
+.chat-log {
+  height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem;
+  background: #fbfcff;
+  margin: 0.7rem 0;
+}
+
+#assistant-settings {
+  margin-top: 0.7rem;
+}
+
+.message {
+  margin: 0.5rem 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  max-width: 92%;
+}
+
+.message.user {
+  margin-left: auto;
+  background: #e9efff;
+}
+
+.message.assistant {
+  margin-right: auto;
+  background: #e9f9f3;
+}
+
+.chat-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+}
